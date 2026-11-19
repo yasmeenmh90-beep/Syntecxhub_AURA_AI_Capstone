@@ -13,3 +13,6 @@ models/
 *.enc
 .env
 .DS_Store
+
+# Local clone of this repo kept inside the working folder
+Syntecxhub_AURA_AI_Capstone/
