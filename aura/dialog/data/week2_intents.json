@@ -1,0 +1,94 @@
+{
+  "intents": [
+    {
+      "tag": "greeting",
+      "patterns": ["\\b(hi|hello|hey|hiya|yo|salam|assalam|greetings)\\b", "\\bgood (morning|afternoon|evening)\\b", "\\bwhat'?s up\\b"],
+      "responses": [
+        "Hey{name}! I'm NOVA, your AI study companion. Ask me anything about AI, or type /help.",
+        "Hello{name}! Ready to talk machine learning, LLMs or neural networks?",
+        "Hi{name}! Good to see you. What would you like to explore today?"
+      ]
+    },
+    {
+      "tag": "farewell",
+      "patterns": ["\\b(bye|goodbye|see you|see ya|later|quit|exit)\\b", "\\bgood ?night\\b"],
+      "responses": [
+        "Goodbye{name}! Keep learning.",
+        "See you soon{name}. Your conversation has been saved."
+      ]
+    },
+    {
+      "tag": "thanks",
+      "patterns": ["\\b(thanks|thank you|thx|ty|appreciate it|cheers)\\b"],
+      "responses": [
+        "Anytime{name}!",
+        "Happy to help. Want to explore another topic?",
+        "You're welcome! Type /topics to see what else I know."
+      ]
+    },
+    {
+      "tag": "help",
+      "patterns": ["\\bhelp\\b", "\\bwhat can you do\\b", "\\bhow (do|does) (this|you) work\\b", "\\bcommands?\\b"],
+      "responses": ["__HELP__"]
+    },
+    {
+      "tag": "bot_identity",
+      "patterns": ["\\bwho are you\\b", "\\bwhat are you\\b", "\\byour name\\b", "\\bare you (a )?(bot|robot|human|ai)\\b"],
+      "responses": [
+        "I'm NOVA, a rule-based chatbot. I match your messages against regex patterns and a small AI knowledge base. No neural network inside, just careful rules.",
+        "NOVA here: a pattern-matching bot built in Python for the Syntecxhub AI internship."
+      ]
+    },
+    {
+      "tag": "how_are_you",
+      "patterns": ["\\bhow are (you|u)\\b", "\\bhow'?s it going\\b", "\\bhow are things\\b"],
+      "responses": [
+        "Running at 100% uptime and zero bugs (that I know of). How about you?",
+        "Doing great, thanks for asking! How's your day going?"
+      ]
+    },
+    {
+      "tag": "feeling_good",
+      "patterns": ["\\b(i'?m|i am) (good|great|fine|ok|okay|awesome|doing well)\\b"],
+      "responses": ["Glad to hear it! Want to learn something new about AI?", "Nice! Let's keep that energy. Ask me about any AI topic."]
+    },
+    {
+      "tag": "feeling_bad",
+      "patterns": ["\\b(i'?m|i am) (sad|tired|bored|stressed|not (good|okay|ok))\\b"],
+      "responses": ["Sorry to hear that. A short break helps. When you're back, I'll be here with a fun AI fact.", "That's rough. Want a fun fact to lighten things up? Type 'fun fact'."]
+    },
+    {
+      "tag": "joke",
+      "patterns": ["\\bjoke\\b", "\\bmake me laugh\\b", "\\bsomething funny\\b"],
+      "responses": [
+        "Why did the neural network break up with the dataset? It found it too biased.",
+        "I told my model a joke about overfitting. It memorised it but didn't get it.",
+        "Why was the ML engineer calm? They had a lot of regularization in their life."
+      ]
+    },
+    {
+      "tag": "fun_fact",
+      "patterns": ["\\bfun fact\\b", "\\bfact\\b", "\\bsomething interesting\\b"],
+      "responses": [
+        "The term 'Artificial Intelligence' was coined in 1956 at the Dartmouth workshop.",
+        "ELIZA (1966) was one of the first chatbots, and it was rule-based, just like me.",
+        "The perceptron, an early neural network, was introduced by Frank Rosenblatt in 1958."
+      ]
+    },
+    {
+      "tag": "creator",
+      "patterns": ["\\bwho (made|built|created) you\\b", "\\byour (creator|developer)\\b"],
+      "responses": ["I was built as Project 1 of the Syntecxhub AI internship, using Python, regex and the rich library."]
+    },
+    {
+      "tag": "time",
+      "patterns": ["\\bwhat time\\b", "\\bcurrent time\\b", "\\btime is it\\b"],
+      "responses": ["__TIME__"]
+    },
+    {
+      "tag": "date",
+      "patterns": ["\\bwhat('?s| is) (the )?date\\b", "\\btoday'?s date\\b", "\\bwhat day is it\\b"],
+      "responses": ["__DATE__"]
+    }
+  ]
+}

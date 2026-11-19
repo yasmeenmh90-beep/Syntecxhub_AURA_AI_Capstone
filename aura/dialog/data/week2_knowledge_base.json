@@ -1,0 +1,80 @@
+{
+  "domain": "Artificial Intelligence",
+  "topics": [
+    {
+      "topic": "Artificial Intelligence",
+      "keywords": ["artificial intelligence", "what is ai", "define ai", "ai mean"],
+      "answer": "Artificial Intelligence is the field of building systems that perform tasks normally needing human intelligence, such as reasoning, perception, language understanding and decision-making."
+    },
+    {
+      "topic": "Machine Learning",
+      "keywords": ["machine learning", "ml", "learn from data"],
+      "answer": "Machine Learning is a subset of AI where models learn patterns from data instead of being explicitly programmed. The three main types are supervised, unsupervised and reinforcement learning."
+    },
+    {
+      "topic": "Deep Learning",
+      "keywords": ["deep learning", "dl", "deep neural"],
+      "answer": "Deep Learning uses neural networks with many layers to learn hierarchical features. It powers image recognition, speech recognition and modern language models."
+    },
+    {
+      "topic": "Neural Network",
+      "keywords": ["neural network", "neuron", "perceptron", "layers"],
+      "answer": "A neural network is a set of connected layers of 'neurons'. Each neuron computes a weighted sum of its inputs, applies an activation function, and passes the result on. Training adjusts the weights to reduce error."
+    },
+    {
+      "topic": "Supervised Learning",
+      "keywords": ["supervised", "labeled data", "labelled data", "classification", "regression"],
+      "answer": "Supervised learning trains a model on labelled examples (input + correct output). Classification predicts categories; regression predicts continuous values."
+    },
+    {
+      "topic": "Unsupervised Learning",
+      "keywords": ["unsupervised", "clustering", "k-means", "kmeans", "unlabeled"],
+      "answer": "Unsupervised learning finds structure in unlabelled data, e.g. clustering similar customers with K-Means or reducing dimensions with PCA."
+    },
+    {
+      "topic": "Reinforcement Learning",
+      "keywords": ["reinforcement", "rl", "reward", "agent environment"],
+      "answer": "Reinforcement learning trains an agent to act in an environment by maximising cumulative reward through trial and error. It's used in games, robotics and recommendation systems."
+    },
+    {
+      "topic": "NLP",
+      "keywords": ["nlp", "natural language processing", "text processing", "tokenization"],
+      "answer": "Natural Language Processing (NLP) lets computers understand and generate human language. Common tasks include tokenization, sentiment analysis, translation and question answering."
+    },
+    {
+      "topic": "Large Language Models",
+      "keywords": ["llm", "large language model", "gpt", "chatgpt", "claude", "transformer"],
+      "answer": "Large Language Models are transformer-based networks trained on huge text corpora to predict the next token. That simple objective lets them write, summarise, translate and answer questions."
+    },
+    {
+      "topic": "Chatbot",
+      "keywords": ["chatbot", "rule based", "rule-based", "eliza", "aiml", "chatterbot"],
+      "answer": "A rule-based chatbot (like me) maps user input to responses using patterns, keywords or AIML templates. It's predictable and transparent, but it only knows what its rules cover, unlike ML-based bots that generalise from data."
+    },
+    {
+      "topic": "Overfitting",
+      "keywords": ["overfitting", "overfit", "underfitting", "generalization", "generalisation"],
+      "answer": "Overfitting happens when a model memorises the training data and performs poorly on new data. Fixes include more data, regularization, dropout, early stopping and cross-validation."
+    },
+    {
+      "topic": "Computer Vision",
+      "keywords": ["computer vision", "image recognition", "cnn", "convolutional", "object detection"],
+      "answer": "Computer Vision enables machines to interpret images and video. Convolutional Neural Networks (CNNs) are the classic architecture for tasks like classification and object detection."
+    },
+    {
+      "topic": "RAG",
+      "keywords": ["rag", "retrieval augmented", "retrieval-augmented", "vector database", "embeddings"],
+      "answer": "Retrieval-Augmented Generation (RAG) retrieves relevant documents (often via vector embeddings) and feeds them to an LLM so its answers are grounded in real sources."
+    },
+    {
+      "topic": "Python for AI",
+      "keywords": ["python", "library", "libraries", "scikit", "tensorflow", "pytorch", "pandas"],
+      "answer": "Python is the go-to language for AI. Key libraries: NumPy and pandas for data, scikit-learn for classical ML, PyTorch and TensorFlow for deep learning, and Hugging Face Transformers for NLP."
+    },
+    {
+      "topic": "AI Ethics",
+      "keywords": ["ethics", "bias", "fairness", "responsible ai", "privacy"],
+      "answer": "AI ethics covers fairness, bias, transparency, privacy and accountability, making sure AI systems don't harm people or treat groups unfairly."
+    }
+  ]
+}
