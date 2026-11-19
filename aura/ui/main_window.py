@@ -15,7 +15,6 @@ from PySide6.QtWidgets import (
     QMainWindow,
     QMessageBox,
     QPushButton,
-    QStackedWidget,
     QTableWidget,
     QTableWidgetItem,
     QVBoxLayout,
@@ -25,8 +24,10 @@ from PySide6.QtWidgets import (
 from aura.core.assistant import Assistant, Reply
 from aura.core.state import AssistantState, AuthMethod
 from aura.ui import theme
+from aura.ui.dashboard import DashboardPage
 from aura.ui.lock_screen import LockScreen
 from aura.ui.widgets.chat import ChatView
+from aura.ui.widgets.motion import AnimatedStack, Toast
 from aura.ui.widgets.visuals import AmbientBackground, CameraView, Orb, PipelineStepper
 from aura.ui.workers import CameraWorker, ListenWorker, TaskWorker
 from aura.voice import Speaker, SpeechRecognizer
@@ -181,6 +182,7 @@ class AssistantPage(QWidget):
         self.busy = True
         self.w.stepper.set_states("done", "done", "active")
         self.set_state(AssistantState.PROCESSING)
+        self.chat.show_typing()
         worker = TaskWorker(fn, *args, parent=self)
         self.workers.add(worker)
         worker.result.connect(self.on_reply)
@@ -191,6 +193,7 @@ class AssistantPage(QWidget):
     # Stage 3 — act / respond
     def on_reply(self, reply: Reply) -> None:
         self.busy = False
+        self.chat.hide_typing()
         if reply.needs_confirmation:
             card_ = self.chat.add_confirmation(reply.text)
             card_.answered.connect(lambda ok: self._run(self.w.assistant.confirm, ok))
@@ -322,6 +325,7 @@ class HistoryPage(QWidget):
         if QMessageBox.question(self, "Clear history", "Delete the entire command history?") == QMessageBox.Yes:
             self.w.s.repository.clear_history()
             self.refresh()
+            self.w.toast.show_message("History cleared")
 
 
 # ── Security page ────────────────────────────────────────────────────────────
@@ -434,6 +438,7 @@ class SecurityPage(QWidget):
         self.camera.set_scanning(False)
         self.refresh()
         self.status.setText(f"✓ {msg}. Next time, choose “Unlock with Face”.")
+        self.w.toast.show_message("Face enrolled: face unlock is ready")
 
     def _failed(self, msg):
         self.worker = None
@@ -446,10 +451,13 @@ class SecurityPage(QWidget):
                                 "Delete your encrypted face template and its keychain key?") == QMessageBox.Yes:
             self.w.s.templates.delete()
             self.refresh()
+            self.w.toast.show_message("Face enrollment deleted", "warning")
 
 
 # ── Window ───────────────────────────────────────────────────────────────────
 class MainWindow(QMainWindow):
+    PAGE_DASHBOARD, PAGE_ASSISTANT, PAGE_HISTORY, PAGE_SECURITY = range(4)
+
     def __init__(self, services, speak: bool = False):
         super().__init__()
         self.s = services
@@ -464,9 +472,10 @@ class MainWindow(QMainWindow):
         root.setObjectName("Root")
         layout = QVBoxLayout(root)
         layout.setContentsMargins(0, 0, 0, 0)
-        self.stack = QStackedWidget()
+        self.stack = AnimatedStack()
         layout.addWidget(self.stack)
         self.setCentralWidget(root)
+        self.toast = Toast(root)
 
         self.lock_screen = LockScreen(services, self.assistant)
         self.lock_screen.unlocked.connect(self.on_unlocked)
@@ -508,15 +517,16 @@ class MainWindow(QMainWindow):
         s.addSpacing(18)
 
         s.addWidget(label("NAVIGATE", "Eyebrow"))
-        self.pages = QStackedWidget()
+        self.pages = AnimatedStack()
+        self.dashboard = DashboardPage(self)
         self.assistant_page = AssistantPage(self)
         self.history = HistoryPage(self)
         self.security = SecurityPage(self)
         group = QButtonGroup(self)
         group.setExclusive(True)
         self.nav = []
-        for i, (text, page) in enumerate((("✦   Assistant", self.assistant_page), ("☰   History", self.history),
-                                          ("◈   Security && setup", self.security))):
+        for i, (text, page) in enumerate((("◐   Dashboard", self.dashboard), ("✦   Assistant", self.assistant_page),
+                                          ("☰   History", self.history), ("◈   Security && setup", self.security))):
             self.pages.addWidget(page)
             btn = QPushButton(text)
             btn.setObjectName("Nav")
@@ -551,13 +561,17 @@ class MainWindow(QMainWindow):
 
     def go(self, index: int) -> None:
         self.nav[index].setChecked(True)
-        if self.pages.currentWidget() is self.security and index != 2:
+        if self.pages.currentWidget() is self.security and index != self.PAGE_SECURITY:
             self.security.stop()
-        self.pages.setCurrentIndex(index)
-        if index == 1:
+        if index == self.PAGE_DASHBOARD:
+            self.dashboard.refresh()
+        if index == self.PAGE_HISTORY:
             self.history.refresh()
-        if index == 2:
+        if index == self.PAGE_SECURITY:
             self.security.refresh()
+        self.pages.setCurrentIndex(index)
+        if index == self.PAGE_ASSISTANT:
+            self.assistant_page.input.setFocus()
 
     def on_unlocked(self, method: AuthMethod) -> None:
         self.lock_screen.stop_camera()
@@ -567,8 +581,9 @@ class MainWindow(QMainWindow):
         self.session_since.setText(f"Started {session.started[11:19]}")
         self.stepper.set_states("done", "active", "pending")
         self.stack.setCurrentIndex(1)
-        self.go(0)
         self.assistant_page.on_unlock()
+        self.go(self.PAGE_DASHBOARD)
+        self.toast.show_message(f"Unlocked · {session.method}", "warning" if session.demo else "success")
 
     def show_lock(self) -> None:
         self.assistant_page.shutdown()

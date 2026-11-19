@@ -13,6 +13,7 @@ from PySide6.QtWidgets import (
 )
 
 from aura.ui import theme
+from aura.ui.widgets.motion import TypingIndicator, fade_in
 
 
 class Bubble(QFrame):
@@ -101,6 +102,7 @@ class ChatView(QScrollArea):
         if not right:
             row.addStretch()
         self.column.addLayout(row)
+        fade_in(widget, 300, lift=10)
         QTimer.singleShot(30, lambda: self.verticalScrollBar().setValue(self.verticalScrollBar().maximum()))
 
     def add_user(self, text: str) -> None:
@@ -117,7 +119,28 @@ class ChatView(QScrollArea):
         self._append(card, right=False)
         return card
 
+    def show_typing(self) -> None:
+        self.hide_typing()
+        self.typing = TypingIndicator()
+        self._append(self.typing, right=False)
+
+    def hide_typing(self) -> None:
+        typing = getattr(self, "typing", None)
+        if typing is None:
+            return
+        self.typing = None
+        for i in range(self.column.count()):
+            layout = self.column.itemAt(i).layout()
+            if layout and layout.indexOf(typing) >= 0:
+                self.column.takeAt(i)
+                while layout.count():
+                    w = layout.takeAt(0).widget()
+                    if w:
+                        w.deleteLater()
+                break
+
     def clear(self) -> None:
+        self.typing = None
         while self.column.count() > 1:
             item = self.column.takeAt(1)
             layout = item.layout()

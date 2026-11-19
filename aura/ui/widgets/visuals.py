@@ -24,19 +24,67 @@ def _alpha(colour: str, a: float) -> QColor:
 
 
 class AmbientBackground(QWidget):
-    """Root surface with two soft colour glows — gives the app depth without images."""
+    """Root surface with slowly drifting aurora glows. Pauses when hidden (and with reduced motion)."""
 
-    def paintEvent(self, _event):
-        p = QPainter(self)
+    BLOBS = (  # (x, y, radius as fraction of width, colour, alpha, speed, phase)
+        (0.12, -0.05, 0.55, theme.VIOLET, 0.20, 0.050, 0.0),
+        (1.00, 1.05, 0.50, theme.CYAN, 0.13, 0.040, 2.1),
+        (0.62, 0.30, 0.32, "#6D28D9", 0.08, 0.065, 4.2),
+    )
+
+    SCALE = 8       # the glow is blurry anyway: render at 1/8 size and upscale smoothly
+    INTERVAL = 200  # ms; the drift is so slow that 5 fps looks continuous and keeps idle CPU low
+
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.phase = 0.0
+        self.frame: QImage | None = None
+        self.timer = QTimer(self, interval=self.INTERVAL, timeout=self._tick)
+
+    def showEvent(self, event):
+        from aura.ui.widgets.motion import REDUCED
+        if not REDUCED:
+            self.timer.start()
+        super().showEvent(event)
+
+    def hideEvent(self, event):
+        self.timer.stop()
+        super().hideEvent(event)
+
+    def resizeEvent(self, event):
+        self.frame = None
+        super().resizeEvent(event)
+
+    def _tick(self):
+        if self.window().isMinimized() or not self.window().isActiveWindow():
+            return  # frozen while minimised or in the background
+        self.phase += self.INTERVAL / 1000
+        self.frame = None
+        self.update()
+
+    def _render(self) -> QImage:
+        w, h = max(1, self.width() // self.SCALE), max(1, self.height() // self.SCALE)
+        img = QImage(w, h, QImage.Format_RGB32)
+        img.fill(QColor(theme.BG))
+        p = QPainter(img)
         p.setRenderHint(QPainter.Antialiasing)
-        p.fillRect(self.rect(), QColor(theme.BG))
-        w, h = self.width(), self.height()
-        for centre, radius, colour, a in ((QPointF(w * 0.15, -h * 0.05), w * 0.55, theme.VIOLET, 0.20),
-                                          (QPointF(w * 1.0, h * 1.05), w * 0.5, theme.CYAN, 0.13)):
+        for x, y, r, colour, a, speed, offset in self.BLOBS:
+            t = self.phase * speed + offset
+            centre = QPointF(w * (x + 0.06 * math.sin(t)), h * (y + 0.08 * math.cos(t * 1.3)))
+            radius = w * r * (1 + 0.06 * math.sin(t * 0.7))
             g = QRadialGradient(centre, radius)
-            g.setColorAt(0, _alpha(colour, a))
+            g.setColorAt(0, _alpha(colour, a * (0.85 + 0.15 * math.sin(t * 1.7))))
             g.setColorAt(1, _alpha(colour, 0))
-            p.fillRect(self.rect(), g)
+            p.fillRect(img.rect(), g)
+        p.end()
+        return img
+
+    def paintEvent(self, event):
+        if self.frame is None:
+            self.frame = self._render()
+        p = QPainter(self)
+        p.setRenderHint(QPainter.SmoothPixmapTransform)
+        p.drawImage(self.rect(), self.frame)
 
 
 class Orb(QWidget):
@@ -57,15 +105,25 @@ class Orb(QWidget):
         self.setFixedSize(size, size)
         self.state = AssistantState.IDLE
         self.phase = 0.0
-        self.timer = QTimer(self, interval=16, timeout=self._tick)
+        self.timer = QTimer(self, interval=33, timeout=self._tick)
+
+    def showEvent(self, event):
         self.timer.start()
+        super().showEvent(event)
+
+    def hideEvent(self, event):
+        self.timer.stop()
+        super().hideEvent(event)
 
     def set_state(self, state: AssistantState) -> None:
         self.state = state
         self.update()
 
     def _tick(self):
-        self.phase += 0.016
+        win = self.window()
+        if not self.isVisible() or win.isMinimized() or not win.isActiveWindow():
+            return  # paused while hidden or while another app has focus
+        self.phase += 0.033
         self.update()
 
     def paintEvent(self, _event):

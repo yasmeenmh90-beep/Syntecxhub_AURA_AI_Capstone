@@ -10,7 +10,7 @@
 | Modular design so interns can reuse earlier projects' code | ✅ Reusable design · ✅ Week 2 reused | **Integrated:** Week 2 chatbot intents + knowledge base (copied unchanged, matcher ported) answer non-command input. **Plug-in points only (not integrated):** Week 3 face/gesture, NOVA voice. See [ARCHITECTURE.md#reuse-map](ARCHITECTURE.md#reuse-map) |
 | Short demo script | ✅ Complete | `docs/DEMO_SCRIPT.md` leads with real face unlock in the GUI. `python main.py demo` is a sandboxed reproducibility run using demo/presence auth, **not** face identity |
 | README for reproducibility | ✅ Complete | `README.md`, `docs/INSTALLATION.md`, pinned `requirements.txt`, `scripts/download_models.py` |
-| Tests | ✅ 120 passing (camera/mic faked) | `tests/unit`, `tests/integration`, `tests/gui` |
+| Tests | ✅ 124 passing (camera/mic faked) | `tests/unit`, `tests/integration`, `tests/gui` |
 
 ## Work done
 * Reuse pass: integrated Week 2 chatbot rules (`aura/dialog/smalltalk.py`), added the reuse map, put real face auth first in the demo script.

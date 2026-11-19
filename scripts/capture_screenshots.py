@@ -14,6 +14,29 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 
+def seed_week(repo) -> None:
+    """Sample history for the past 6 days so the dashboard has something to show (sandbox only)."""
+    import random
+    import uuid
+    from datetime import datetime, timedelta
+
+    from aura.commands.executor import ExecutionResult
+
+    rng = random.Random(7)
+    pool = [("get_time", "success")] * 5 + [("open_website", "success")] * 4 + \
+           [("knowledge", "success")] * 3 + [("create_note", "success")] * 3 + \
+           [("search_web", "success")] * 2 + [("search_web", "cancelled"), ("unknown_command", "rejected"),
+                                              ("unknown_command", "rejected"), ("read_note", "error")]
+    now = datetime.now().astimezone()
+    for days_ago, count in zip(range(6, 0, -1), (4, 7, 3, 9, 6, 11), strict=True):
+        day = now - timedelta(days=days_ago)
+        for k in range(count):
+            intent, status = rng.choice(pool)
+            stamp = day.replace(hour=9 + k % 10, minute=rng.randrange(60)).isoformat(timespec="milliseconds")
+            repo.record(ExecutionResult(str(uuid.uuid4()), intent, status, "sample", stamp, stamp))
+        repo.record_session(day.isoformat(), "Face recognition" if days_ago % 3 else "Local PIN / password")
+
+
 def main() -> int:
     from PySide6.QtCore import QEventLoop, QTimer
     from PySide6.QtWidgets import QApplication
@@ -40,14 +63,16 @@ def main() -> int:
         cfg = Config(Path(tmp), Config.load().models)
         services = Services.build(cfg, adapter=DryRunAdapter(), keyring_backend=MemoryKeyring())
         services.credentials.setup("demo-pin-1234")
+        seed_week(services.repository)
         window = MainWindow(services)
         window.resize(1280, 820)
         window.show()
         settle()
         window.grab().save(str(out / "01-lock-screen.png"))
 
-        window.assistant.unlock(AuthMethod.PIN)
-        window.on_unlocked(AuthMethod.PIN)
+        window.assistant.unlock(AuthMethod.FACE)
+        window.on_unlocked(AuthMethod.FACE)
+        window.go(window.PAGE_ASSISTANT)
         page = window.assistant_page
 
         # Build up some history first (shown on the History page).
@@ -65,12 +90,20 @@ def main() -> int:
             page.submit(text)
             settle(800)
         settle(1500)
+        window.toast.hide()
         window.grab().save(str(out / "02-assistant.png"))
 
-        window.go(1)
+        window.resize(1280, 1240)  # tall enough to show the whole dashboard
+        window.go(window.PAGE_DASHBOARD)
+        settle(1800)  # let the count-ups and bar grow-ins finish
+        window.grab().save(str(out / "00-dashboard.png"))
+        window.resize(1280, 820)
+        settle()
+
+        window.go(window.PAGE_HISTORY)
         settle()
         window.grab().save(str(out / "03-history.png"))
-        window.go(2)
+        window.go(window.PAGE_SECURITY)
         settle()
         window.grab().save(str(out / "04-security.png"))
         window.close()

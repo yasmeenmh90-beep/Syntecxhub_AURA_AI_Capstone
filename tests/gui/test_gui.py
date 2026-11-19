@@ -37,9 +37,9 @@ def test_pin_unlock_command_confirm_and_lock(window, qtbot, adapter):
     page.chat.cards[-1].yes.click()
     qtbot.waitUntil(lambda: adapter.actions == [("website", "https://github.com")], timeout=3000)
 
-    window.go(1)
+    window.go(window.PAGE_HISTORY)
     assert window.history.table.rowCount() >= 2
-    window.go(2)
+    window.go(window.PAGE_SECURITY)
     assert not window.security.enroll_btn.isEnabled()  # models missing in sandbox
 
     page.submit("lock")
@@ -51,7 +51,7 @@ def test_demo_mode_flags_low_assurance(window):
     window.lock_screen.demo_btn.click()
     assert window.s.session.demo
     assert "not verified" in window.assistant_page.trust.text()
-    window.go(2)
+    window.go(window.PAGE_SECURITY)
     assert not window.security.delete_btn.isEnabled()
 
 
@@ -67,3 +67,43 @@ def test_verified_pill_and_lock_shortcut(window, qtbot):
     qtbot.keyClick(window, Qt.Key_L, Qt.ControlModifier)  # Qt's Ctrl is ⌘ on macOS
     qtbot.waitUntil(lambda: window.stack.currentIndex() == 0, timeout=2000)
     assert not window.s.session.authenticated
+
+
+def test_dashboard_reflects_activity(window, qtbot):
+    window.lock_screen.demo_btn.click()
+    assert window.pages.currentWidget() is window.dashboard      # lands on the dashboard
+    assert window.toast.isVisible() and "Unlocked" in window.toast.text.text()
+    bot = window.assistant
+    for text in ("what time is it", "make me a sandwich", "tell me a joke"):
+        bot.handle(text)
+    window.go(window.PAGE_DASHBOARD)
+    d = window.dashboard
+    qtbot.waitUntil(lambda: d.t_commands.value.text() == "3", timeout=3000)   # count-up finished
+    assert d.columns.data[-1][2] == 3 and d.columns.data[-1][0] == "Today"
+    assert "2 of 3 succeeded" in d.outcome_value.text()
+    assert {name for name, _ in d.intents.data} == {"get_time", "unknown_command", "chat_joke"}
+    assert d.feed.count() > 2
+
+
+def test_typing_indicator_shows_then_clears(window, qtbot):
+    window.lock_screen.demo_btn.click()
+    window.go(window.PAGE_ASSISTANT)
+    page = window.assistant_page
+    page.submit("what time is it")
+    assert page.chat.typing is not None
+    qtbot.waitUntil(lambda: page.chat.typing is None and not page.busy, timeout=3000)
+
+
+def test_dashboard_refresh_leaves_no_orphan_labels(window, qtbot):
+    from PySide6.QtWidgets import QLabel
+    window.lock_screen.demo_btn.click()
+    window.assistant.handle("what time is it")
+    card = window.dashboard.feed.parentWidget()
+
+    def visible_labels():
+        return [w for w in card.findChildren(QLabel) if not w.isHidden()]
+    window.go(window.PAGE_DASHBOARD)
+    first = len(visible_labels())
+    for _ in range(3):
+        window.dashboard.refresh()
+    assert len(visible_labels()) == first

@@ -35,3 +35,22 @@ def test_refuses_newer_schema(tmp_path):
 def test_database_file_is_private(tmp_path):
     Repository(tmp_path / "a.db")
     assert oct((tmp_path / "a.db").stat().st_mode & 0o777) == "0o600"
+
+
+def test_stats_aggregates(tmp_path):
+    from datetime import datetime
+    repo = Repository(tmp_path / "a.db")
+    now = datetime.now().astimezone().isoformat()
+    for i, (intent, status) in enumerate([("get_time", "success"), ("get_time", "success"),
+                                          ("open_website", "confirmation_required"),
+                                          ("open_website", "success"), ("unknown_command", "rejected")]):
+        repo.record(ExecutionResult(str(i), intent, status, "m", now, now))
+    repo.record_session(now, "Face recognition")
+    repo.record_session(now, "Local PIN / password")
+    s = repo.stats()
+    assert s["total"] == 4                       # confirmation steps are not outcomes
+    assert s["success_rate"] == 0.75
+    assert s["intents"][0] == ("get_time", 2)
+    assert s["days"][-1][1] == 4 and len(s["days"]) == 7
+    assert (s["sessions"], s["face_sessions"]) == (2, 1)
+    assert Repository(tmp_path / "b.db").stats()["success_rate"] is None

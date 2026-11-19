@@ -13,7 +13,7 @@
 </p>
 <p>
   <img alt="Vosk" src="https://img.shields.io/badge/Voice-Vosk%20offline-8B5CF6?style=flat-square">
-  <img alt="Tests" src="https://img.shields.io/badge/tests-120%20passing-34D399?style=flat-square">
+  <img alt="Tests" src="https://img.shields.io/badge/tests-124%20passing-34D399?style=flat-square">
   <img alt="Lint" src="https://img.shields.io/badge/lint-ruff%20clean-22D3EE?style=flat-square">
   <img alt="Privacy" src="https://img.shields.io/badge/cloud%20calls-zero-F59E0B?style=flat-square">
   <img alt="Platforms" src="https://img.shields.io/badge/macOS%20%C2%B7%20Windows%20%C2%B7%20Linux-475077?style=flat-square">
@@ -27,7 +27,7 @@
 
 <br><br>
 
-<img src="docs/screenshots/02-assistant.png" alt="AURA assistant screen" width="92%">
+<img src="docs/screenshots/00-dashboard.png" alt="AURA dashboard" width="92%">
 
 </div>
 
@@ -68,9 +68,16 @@ It **asks before** anything leaves the app, and **logs** every action without pr
 
 A single `Assistant` class drives **three front-ends**: the desktop app, the terminal app and a sandboxed scripted demo.
 
+### ✨ The desktop app
+- **Dashboard:** animated KPI tiles that count up, a 7-day activity chart, an outcomes bar, top intents and a live activity feed. Every bar has a hover tooltip.
+- **Motion:** a drifting aurora background, cross-fading page transitions, chat bubbles that slide in, a “thinking” indicator, a state orb that pulses or ripples as AURA listens and works, and toast notifications.
+- **Light on resources:** animations pause when AURA isn't the focused window. Set `AURA_REDUCED_MOTION=1` to turn transitions off.
+
 ---
 
 ## 📸 Screenshots
+
+<p align="center"><img src="docs/screenshots/00-dashboard.png" alt="Dashboard" width="88%"><br><b>Dashboard</b>: KPIs, activity, outcomes, top intents, live feed and system readiness</p>
 
 <table>
 <tr>
@@ -90,7 +97,7 @@ A single `Assistant` class drives **three front-ends**: the desktop app, the ter
 <p align="center"><img src="docs/screenshots/06-cli-session.svg" alt="CLI session" width="85%"></p>
 </details>
 
-> Screenshots are generated with `python scripts/capture_screenshots.py`, which renders each screen in a throwaway sandbox (no camera, no real data).
+> Screenshots are generated with `python scripts/capture_screenshots.py`. It renders each screen in a throwaway sandbox with no camera and no real data. The dashboard is seeded with a week of **sample** history so its charts have something to show.
 
 ---
 
@@ -240,7 +247,7 @@ Full reuse map: [docs/ARCHITECTURE.md#reuse-map](docs/ARCHITECTURE.md#reuse-map)
 ## 🧪 Testing
 
 ```bash
-pytest          # 120 tests: unit · integration · GUI (pytest-qt, offscreen)
+pytest          # 124 tests: unit · integration · GUI (pytest-qt, offscreen)
 ruff check .    # lint
 ```
 
@@ -264,7 +271,7 @@ The real ONNX and Vosk models are smoke-tested when they are present. The physic
 | “Biometric encryption key is unavailable” | The keychain entry was removed. Delete the enrollment in Security and enroll again. |
 | Want a clean slate | `AURA_DATA_DIR=/tmp/aura-test python main.py` |
 
-Settings are environment variables: `AURA_DATA_DIR`, `AURA_MODEL_DIR`, `AURA_VOSK_MODEL`, `AURA_CAMERA_INDEX` (see `.env.example`).
+Settings are environment variables: `AURA_DATA_DIR`, `AURA_MODEL_DIR`, `AURA_VOSK_MODEL`, `AURA_CAMERA_INDEX`, `AURA_REDUCED_MOTION` (see `.env.example`).
 
 ---
 

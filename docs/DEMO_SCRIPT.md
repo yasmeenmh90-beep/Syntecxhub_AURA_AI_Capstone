@@ -29,6 +29,8 @@ python main.py
 4. **Unlock with Face.** The scan line runs, a green box tracks your face, and the status counts `Checking identity · 1/4 … 4/4`. The sidebar shows *Face recognition* and the pill reads *Verified session*.
 5. *Optional:* a colleague tries and it times out. Then show **Presence check**: it detects *a* face but not *whose*, so the session is flagged amber.
 
+After unlocking, AURA opens on the **Dashboard**. Point out the animated KPI tiles, the 7-day activity chart (hover a column), outcomes, top intents and the live feed. Then click **Ask AURA**.
+
 ## Part 2: Voice + text commands (90 s)
 1. Click 🎙 and say **"What time is it?"**. The orb turns cyan, the live transcript appears, and the answer comes back.
 2. Type **"Create a note called demo day: Capstone presented!"**
@@ -38,6 +40,7 @@ python main.py
 6. **"Make me a sandwich"** is rejected, because AURA never guesses.
 
 ## Part 3: Audit & security (45 s)
+* **Dashboard:** go back to it after Part 2. The counts, chart and feed now include the commands you just ran.
 * **History:** every command is listed with its status. Note bodies are never stored.
 * **Security:** readiness checklist (including *Week 2 chatbot rules*) and *Delete enrollment*.
 
@@ -53,5 +56,5 @@ python main.py cli --auth face --voice
 * Three independent modules (**vision**, **dialog**, **executor**) joined by one `Assistant` class.
 * Reuse: Week 2's rules and knowledge base run inside AURA. Week 3 vision and the NOVA voice module have defined plug-in points ([ARCHITECTURE.md#reuse-map](ARCHITECTURE.md#reuse-map)).
 * Fully offline: OpenCV ONNX models, Vosk, SQLite.
-* 120 automated tests, including GUI tests (the camera and microphone are faked in tests and were verified by hand in rehearsal).
+* 124 automated tests, including GUI tests (the camera and microphone are faked in tests and were verified by hand in rehearsal).
 * Known limitation: no liveness detection (a photo may pass). Next step: a blink or head-turn challenge.

@@ -87,3 +87,35 @@ class Repository:
     def record_session(self, started: str, method: str) -> None:
         with self.connection() as db:
             db.execute("INSERT INTO sessions VALUES (?,?)", (started, method))
+
+    def stats(self, days: int = 7) -> dict:
+        """Aggregates for the dashboard. `confirmation_required` rows are intermediate steps, not outcomes."""
+        from datetime import date, timedelta
+        today = date.today()
+        window = [(today - timedelta(days=i)).isoformat() for i in range(days - 1, -1, -1)]
+        final = "status != 'confirmation_required'"
+        with self.connection() as db:
+            outcomes = dict(db.execute(f"SELECT status, COUNT(*) FROM history WHERE {final} GROUP BY status"))
+            intents = [tuple(r) for r in db.execute(
+                f"SELECT intent, COUNT(*) FROM history WHERE {final} GROUP BY intent ORDER BY 2 DESC, 1 LIMIT 6")]
+            per_day = dict(db.execute(
+                f"SELECT substr(started, 1, 10), COUNT(*) FROM history WHERE {final} AND started >= ? "
+                "GROUP BY 1", (window[0],)))
+            sessions = dict(db.execute("SELECT method, COUNT(*) FROM sessions GROUP BY method"))
+            notes = db.execute("SELECT COUNT(*) FROM notes").fetchone()[0]
+            recent = [dict(r) for r in db.execute(
+                f"SELECT intent, status, message, started FROM history WHERE {final} "
+                "ORDER BY started DESC LIMIT 6")]
+        total = sum(outcomes.values())
+        decided = sum(outcomes.get(k, 0) for k in ("success", "error", "rejected"))
+        return {
+            "total": total,
+            "success_rate": (outcomes.get("success", 0) / decided) if decided else None,
+            "outcomes": outcomes,
+            "intents": intents,
+            "days": [(d, per_day.get(d, 0)) for d in window],
+            "sessions": sum(sessions.values()),
+            "face_sessions": sessions.get("Face recognition", 0),
+            "notes": notes,
+            "recent": recent,
+        }
