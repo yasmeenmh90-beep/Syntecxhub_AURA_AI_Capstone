@@ -20,6 +20,8 @@ def build_parser() -> argparse.ArgumentParser:
                                      formatter_class=argparse.RawDescriptionHelpFormatter,
                                      epilog=__doc__.split("\n", 2)[2])
     parser.add_argument("--version", action="version", version=f"AURA {__version__}")
+    # `python main.py` (no subcommand) runs the GUI, so subcommand options need top-level defaults.
+    parser.set_defaults(speak=False, voice=False, auth=None, camera=False, fast=False)
     sub = parser.add_subparsers(dest="command")
 
     gui = sub.add_parser("gui", help="launch the desktop app (default)")

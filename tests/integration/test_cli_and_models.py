@@ -61,3 +61,12 @@ def test_vosk_model_loads():
     from aura.voice import SpeechRecognizer
     recognizer = SpeechRecognizer(real.vosk_model)
     assert recognizer.available and recognizer._load() is not None
+
+
+@pytest.mark.parametrize("argv, speak", [([], False), (["gui"], False), (["gui", "--speak"], True)])
+def test_main_without_subcommand_launches_gui(monkeypatch, tmp_path, argv, speak):
+    import aura.app
+    monkeypatch.setenv("AURA_DATA_DIR", str(tmp_path))
+    calls = []
+    monkeypatch.setattr(aura.app, "run_gui", lambda services, speak=False: calls.append(speak) or 0)
+    assert aura.app.main(argv) == 0 and calls == [speak]

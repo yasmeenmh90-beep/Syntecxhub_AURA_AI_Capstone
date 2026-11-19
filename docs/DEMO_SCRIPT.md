@@ -53,5 +53,5 @@ python main.py cli --auth face --voice
 * Three independent modules (**vision**, **dialog**, **executor**) joined by one `Assistant` class.
 * Reuse: Week 2's rules and knowledge base run inside AURA. Week 3 vision and the NOVA voice module have defined plug-in points ([ARCHITECTURE.md#reuse-map](ARCHITECTURE.md#reuse-map)).
 * Fully offline: OpenCV ONNX models, Vosk, SQLite.
-* 117 automated tests, including GUI tests (the camera and microphone are faked in tests and were verified by hand in rehearsal).
+* 120 automated tests, including GUI tests (the camera and microphone are faked in tests and were verified by hand in rehearsal).
 * Known limitation: no liveness detection (a photo may pass). Next step: a blink or head-turn challenge.

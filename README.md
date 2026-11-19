@@ -13,7 +13,7 @@
 </p>
 <p>
   <img alt="Vosk" src="https://img.shields.io/badge/Voice-Vosk%20offline-8B5CF6?style=flat-square">
-  <img alt="Tests" src="https://img.shields.io/badge/tests-117%20passing-34D399?style=flat-square">
+  <img alt="Tests" src="https://img.shields.io/badge/tests-120%20passing-34D399?style=flat-square">
   <img alt="Lint" src="https://img.shields.io/badge/lint-ruff%20clean-22D3EE?style=flat-square">
   <img alt="Privacy" src="https://img.shields.io/badge/cloud%20calls-zero-F59E0B?style=flat-square">
   <img alt="Platforms" src="https://img.shields.io/badge/macOS%20%C2%B7%20Windows%20%C2%B7%20Linux-475077?style=flat-square">
@@ -240,7 +240,7 @@ Full reuse map: [docs/ARCHITECTURE.md#reuse-map](docs/ARCHITECTURE.md#reuse-map)
 ## 🧪 Testing
 
 ```bash
-pytest          # 117 tests: unit · integration · GUI (pytest-qt, offscreen)
+pytest          # 120 tests: unit · integration · GUI (pytest-qt, offscreen)
 ruff check .    # lint
 ```
 
